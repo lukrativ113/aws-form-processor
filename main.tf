@@ -1,10 +1,4 @@
 terraform {
-  backend "s3" {
-    bucket = "nuytten-tf-remotestate"
-    key    = "form-processor-api/{var.environ}/tfstate"
-    region = "us-east-1"
-  }
-
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -16,6 +10,8 @@ terraform {
       version = "2.2.0"
     }
   }
+  
+  required_version = "1.0.0"
 }
 
 provider "aws" {
