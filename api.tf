@@ -23,7 +23,7 @@ resource "aws_api_gateway_method" "proxy" {
 resource "aws_api_gateway_method_response" "options" {
     rest_api_id   = aws_api_gateway_rest_api.api_lambda.id
     resource_id   = aws_api_gateway_method.proxy.resource_id
-    http_method   = 'OPTIONS'
+    http_method   = "OPTIONS"
     status_code   = "200"
 
     response_models = {
@@ -40,7 +40,7 @@ resource "aws_api_gateway_method_response" "options" {
 resource "aws_api_gateway_integration" "options" {
     rest_api_id   = aws_api_gateway_rest_api.api_lambda.id
     resource_id   = aws_api_gateway_method.proxy.resource_id
-    http_method   = 'OPTIONS'
+    http_method   = "OPTIONS"
     type             = "MOCK"
     content_handling = "CONVERT_TO_TEXT"
 
@@ -52,7 +52,7 @@ resource "aws_api_gateway_integration" "options" {
 resource "aws_api_gateway_integration_response" "options" {
     rest_api_id   = aws_api_gateway_rest_api.api_lambda.id
     resource_id   = aws_api_gateway_method.proxy.resource_id
-    http_method   = 'OPTIONS'
+    http_method   = "OPTIONS"
     status_code   = aws_api_gateway_method_response.options.status_code
 
     response_templates = {
@@ -86,7 +86,7 @@ resource "aws_api_gateway_method" "proxy_root" {
 resource "aws_api_gateway_method_response" "options_root" {
     rest_api_id   = aws_api_gateway_rest_api.api_lambda.id
     resource_id   = aws_api_gateway_method.proxy_root.resource_id
-    http_method   = 'OPTIONS'
+    http_method   = "OPTIONS"
     status_code   = "200"
 
     response_models = {
@@ -103,7 +103,7 @@ resource "aws_api_gateway_method_response" "options_root" {
 resource "aws_api_gateway_integration" "options_root" {
     rest_api_id   = aws_api_gateway_rest_api.api_lambda.id
     resource_id   = aws_api_gateway_method.proxy_root.resource_id
-    http_method   = 'OPTIONS'
+    http_method   = "OPTIONS"
     type             = "MOCK"
     content_handling = "CONVERT_TO_TEXT"
 
@@ -115,7 +115,7 @@ resource "aws_api_gateway_integration" "options_root" {
 resource "aws_api_gateway_integration_response" "options_root" {
     rest_api_id   = aws_api_gateway_rest_api.api_lambda.id
     resource_id   = aws_api_gateway_method.proxy_root.resource_id
-    http_method   = 'OPTIONS'
+    http_method   = "OPTIONS"
     status_code   = aws_api_gateway_method_response.options_root.status_code
 
     response_templates = {
