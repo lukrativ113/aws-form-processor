@@ -13,17 +13,24 @@ resource "aws_api_gateway_resource" "proxy" {
    path_part   = "{proxy+}"
 }
 
-resource "aws_api_gateway_method" "proxy" {
-    rest_api_id   = "${aws_api_gateway_rest_api.api_lambda.id}"
-    resource_id   = "${aws_api_gateway_resource.proxy.id}"
-    http_method   = "ANY"
+resource "aws_api_gateway_method" "post" {
+    rest_api_id   = aws_api_gateway_rest_api.api_lambda.id
+    resource_id   = aws_api_gateway_resource.proxy.id
+    http_method   = "POST"
     authorization = "NONE"
+}
+
+resource "aws_api_gateway_method" "options" {
+  rest_api_id   = aws_api_gateway_rest_api.api_lambda.id
+  resource_id   = aws_api_gateway_resource.proxy.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
 }
 
 resource "aws_api_gateway_method_response" "options" {
     rest_api_id   = aws_api_gateway_rest_api.api_lambda.id
-    resource_id   = aws_api_gateway_method.proxy.resource_id
-    http_method   = "OPTIONS"
+    resource_id   = aws_api_gateway_method.options.resource_id
+    http_method   = aws_api_gateway_method.options.http_method
     status_code   = "200"
 
     response_models = {
@@ -39,8 +46,8 @@ resource "aws_api_gateway_method_response" "options" {
 
 resource "aws_api_gateway_integration" "options" {
     rest_api_id   = aws_api_gateway_rest_api.api_lambda.id
-    resource_id   = aws_api_gateway_method.proxy.resource_id
-    http_method   = "OPTIONS"
+    resource_id   = aws_api_gateway_method.options.resource_id
+    http_method   = aws_api_gateway_method.options.http_method
     type             = "MOCK"
     content_handling = "CONVERT_TO_TEXT"
 
@@ -51,8 +58,8 @@ resource "aws_api_gateway_integration" "options" {
 
 resource "aws_api_gateway_integration_response" "options" {
     rest_api_id   = aws_api_gateway_rest_api.api_lambda.id
-    resource_id   = aws_api_gateway_method.proxy.resource_id
-    http_method   = "OPTIONS"
+    resource_id   = aws_api_gateway_method.options.resource_id
+    http_method   = aws_api_gateway_method.options.http_method
     status_code   = aws_api_gateway_method_response.options.status_code
 
     response_templates = {
@@ -68,25 +75,32 @@ resource "aws_api_gateway_integration_response" "options" {
 
 resource "aws_api_gateway_integration" "lambda" {
     rest_api_id      = aws_api_gateway_rest_api.api_lambda.id
-    resource_id      = aws_api_gateway_method.proxy.resource_id
-    http_method      = aws_api_gateway_method.proxy.http_method
+    resource_id      = aws_api_gateway_method.post.resource_id
+    http_method      = aws_api_gateway_method.post.http_method
 
     integration_http_method = "POST"
     type                    = "AWS_PROXY"
     uri                     = aws_lambda_function.ses_function.invoke_arn
 }
 
-resource "aws_api_gateway_method" "proxy_root" {
+resource "aws_api_gateway_method" "post_root" {
    rest_api_id   = aws_api_gateway_rest_api.api_lambda.id
    resource_id   = aws_api_gateway_rest_api.api_lambda.root_resource_id
-   http_method   = "ANY"
+   http_method   = "POST"
+   authorization = "NONE"
+}
+
+resource "aws_api_gateway_method" "options_root" {
+   rest_api_id   = aws_api_gateway_rest_api.api_lambda.id
+   resource_id   = aws_api_gateway_rest_api.api_lambda.root_resource_id
+   http_method   = "OPTIONS"
    authorization = "NONE"
 }
 
 resource "aws_api_gateway_method_response" "options_root" {
     rest_api_id   = aws_api_gateway_rest_api.api_lambda.id
-    resource_id   = aws_api_gateway_method.proxy_root.resource_id
-    http_method   = "OPTIONS"
+    resource_id   = aws_api_gateway_method.options_root.resource_id
+    http_method   = aws_api_gateway_method.options_root.http_method
     status_code   = "200"
 
     response_models = {
@@ -102,8 +116,8 @@ resource "aws_api_gateway_method_response" "options_root" {
 
 resource "aws_api_gateway_integration" "options_root" {
     rest_api_id   = aws_api_gateway_rest_api.api_lambda.id
-    resource_id   = aws_api_gateway_method.proxy_root.resource_id
-    http_method   = "OPTIONS"
+    resource_id   = aws_api_gateway_method.options_root.resource_id
+    http_method   = aws_api_gateway_method.options_root.http_method
     type             = "MOCK"
     content_handling = "CONVERT_TO_TEXT"
 
@@ -114,8 +128,8 @@ resource "aws_api_gateway_integration" "options_root" {
 
 resource "aws_api_gateway_integration_response" "options_root" {
     rest_api_id   = aws_api_gateway_rest_api.api_lambda.id
-    resource_id   = aws_api_gateway_method.proxy_root.resource_id
-    http_method   = "OPTIONS"
+    resource_id   = aws_api_gateway_method.options_root.resource_id
+    http_method   = aws_api_gateway_method.options_root.http_method
     status_code   = aws_api_gateway_method_response.options_root.status_code
 
     response_templates = {
@@ -131,8 +145,8 @@ resource "aws_api_gateway_integration_response" "options_root" {
 
 resource "aws_api_gateway_integration" "lambda_root" {
    rest_api_id = aws_api_gateway_rest_api.api_lambda.id
-   resource_id = aws_api_gateway_method.proxy_root.resource_id
-   http_method = aws_api_gateway_method.proxy_root.http_method
+   resource_id = aws_api_gateway_method.post_root.resource_id
+   http_method = aws_api_gateway_method.post_root.http_method
 
    integration_http_method = "POST"
    type                    = "AWS_PROXY"
