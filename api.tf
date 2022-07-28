@@ -71,5 +71,5 @@ resource "aws_lambda_permission" "apigw" {
 
 
 output "base_url" {
-  value = aws_api_gateway_deployment.apideploy.invoke_url
+  value = aws_api_gateway_deployment.api_lambda.invoke_url
 }
