@@ -66,9 +66,11 @@ def send_mail(from_email, message_body, body_charset='utf-8'):
     return ses.send_email(**email_args)
 
 def lambda_handler(event, context):
-    print(event)
     if 'body' not in event:
-        raise ValueError('event does not contain the correct body')
+        return get_error('event does not contain the correct body', status=400)
+    
+    if event.get('path') != '/contact/':
+        return get_error('path must be /contact/ to process this request', status=400)
 
     event_body = json.loads(event.get('body'))
     from_email = event_body.get('email')
@@ -77,11 +79,6 @@ def lambda_handler(event, context):
     try:
         ses_response = send_mail(from_email, message)
         message_id = ses_response.get('MessageId')
-        response = get_success(f'Message successfully sent!  ID: {message_id}')
+        return get_success(f'Message successfully sent!  ID: {message_id}')
     except ClientError as ce:
-        print(ce.response)
-        response = get_error(ce.response.get('Error'))
-
-    return response
-
-    
+        return get_error(ce.response.get('Error'), status=400)
