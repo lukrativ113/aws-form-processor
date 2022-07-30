@@ -38,7 +38,7 @@ def create_message(event_body):
     Additional information: {event_body.get('moreinfo') or 'None'}
     """
 
-def send_mail(from_email, message_body, body_charset='utf-8'):
+def send_mail(from_email, message_subject, message_body, body_charset='utf-8'):
     email_args = {
         'Source': SENDER_EMAIL,
         'Destination': {
@@ -48,7 +48,7 @@ def send_mail(from_email, message_body, body_charset='utf-8'):
         },
         'Message': {
             'Subject': {
-                'Data': 'New request from BattlehornCoach.com',
+                'Data': message_subject,
                 'Charset': 'utf-8'
             },
             'Body': {
@@ -74,10 +74,11 @@ def lambda_handler(event, context):
 
     event_body = json.loads(event.get('body'))
     from_email = event_body.get('email')
+    subject = event_body.get('subject', 'New Information Request')
     message = create_message(event_body)
 
     try:
-        ses_response = send_mail(from_email, message)
+        ses_response = send_mail(from_email, subject, message)
         message_id = ses_response.get('MessageId')
         return get_success(f'Message successfully sent!  ID: {message_id}')
     except ClientError as ce:
